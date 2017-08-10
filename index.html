@@ -1,309 +1,429 @@
 <!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <meta charset="UTF-8">
-    <title>Cayman</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#157878">
-    <link rel="stylesheet" href="css/normalize.css">
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="css/cayman.css">
-  </head>
-  <body>
-    <section class="page-header">
-      <h1 class="project-name">Cayman</h1>
-      <h2 class="project-tagline">A responsive theme for your project on GitHub Pages</h2>
-      <a href="#" class="btn">View on GitHub</a>
-      <a href="#" class="btn">Download .zip</a>
-      <a href="#" class="btn">Download .tar.gz</a>
-    </section>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title></title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.26.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.26.0/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+</head>
+<body>
 
-    <section class="main-content">
-      <p>Text can be <strong>bold</strong>, <em>italic</em>, or <del>strikethrough</del>. <a href="https://github.com">Links</a> should be blue with no underlines (unless hovered over).</p>
+<style>
 
-      <p>There should be whitespace between paragraphs. There should be whitespace between paragraphs. There should be whitespace between paragraphs. There should be whitespace between paragraphs.</p>
+    .map-overlay {
+        font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+        position: absolute;
+        width: 25%;
+        top: 0;
+        left: 0;
+        padding: 10px;
+    }
 
-      <p>There should be whitespace between paragraphs. There should be whitespace between paragraphs. There should be whitespace between paragraphs. There should be whitespace between paragraphs.</p>
+    .map-overlay .map-overlay-inner {
+        background-color: #fff;
+        box-shadow:0 1px 2px rgba(0, 0, 0, 0.20);
+        border-radius: 3px;
+        padding: 10px;
+        margin-bottom: 10px;
+    }
 
-      <blockquote>
-      <p>There should be no margin above this first sentence.</p>
+    .map-overlay h2 {
+        line-height: 24px;
+        display: block;
+        margin: 0 0 10px;
+    }
 
-      <p>Blockquotes should be a lighter gray with a gray border along the left side.</p>
+    .map-overlay .legend .bar {
+        height: 10px;
+        display: inline-block;
+    }
 
-      <p>There should be no margin below this final sentence.</p>
-      </blockquote>
+    .map-overlay input {
+        background-color: transparent;
+        display: inline-block;
+        width: 100%;
+        position: relative;
+        margin: 0;
+        cursor: ew-resize;
+    }
 
-      <h1>
-      <a id="user-content-header-1" class="anchor" href="#header-1" aria-hidden="true"><span class="octicon octicon-link"></span></a>Header 1</h1>
+    #fly {
+            display: block;
+            position: relative;
+            margin: 0px auto;
+            width: 5%;
+            height: 40px;
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+            font-size: 12px;
+            text-align: center;
+            color: #fff;
+            background: #ee8a65;
+        }
+    #reset {
+            display: block;
+            position: relative;
+            margin: 0px auto;
+            width: 5%;
+            height: 40px;
+            padding: 10px;
+            border: none;
+            border-radius: 3px;
+            font-size: 12px;
+            text-align: center;
+            color: #fff;
+            background: #ee8a65;
+        }
+</style>
 
-      <p>This is a normal paragraph following a header. Bacon ipsum dolor sit amet t-bone doner shank drumstick, pork belly porchetta chuck sausage brisket ham hock rump pig. Chuck kielbasa leberkas, pork bresaola ham hock filet mignon cow shoulder short ribs biltong.</p>
+<style type='text/css'>
+    #info {
+        display: block;
+        position: relative;
+        margin: 0px auto;
+        width: 50%;
+        padding: 10px;
+        border: none;
+        border-radius: 3px;
+        font-size: 12px;
+        text-align: center;
+        color: #222;
+        background: #fff;
+    }
+</style>
 
-      <h2>
-      <a id="user-content-header-2" class="anchor" href="#header-2" aria-hidden="true"><span class="octicon octicon-link"></span></a>Header 2</h2>
+<div id='map'></div>
+<pre id='info'></pre>
+<br/>
+<button id='reset'>Reset</button>
+<br/>
+<button id='fly'>NW Uganda</button>
 
-      <blockquote>
-      <p>This is a blockquote following a header. Bacon ipsum dolor sit amet t-bone doner shank drumstick, pork belly porchetta chuck sausage brisket ham hock rump pig. Chuck kielbasa leberkas, pork bresaola ham hock filet mignon cow shoulder short ribs biltong.</p>
-      </blockquote>
+<div class='map-overlay top'>
+    <div class='map-overlay-inner'>
+        <fieldset>
+          <label>Select Data Source: </label>
+          <select id='data_picker' name='data_picker'>
+              <option value='cbsd_anyDisease_2'>CBSD</option>
+              <option value='cmd_anyDisease_2'>CMD</option>
+              <option value='whitefly_mean'>Whitefly</option>
+          </select>
+        </fieldset>
+    </div>
+    <div class='map-overlay-inner'>
+      <label id='year_slider_label'></label>
+      <input id='year_slider' type='range' min='0' max='2' step='1' value='0' />
+      <select id='data_picker_cumInst' name='data_picker_cumInst'>
+          <option value='cumulative'>Cumulative</option>
+          <option value='instantaneous'>Instantaneous</option>
+      </select>
+      <select id='data_picker_AnyCultivar' name='data_picker_AnyCultivar'>
+          <option value='dominantCultivar'>Dominant Cultivar</option>
+          <option value='anyCultivar'>Any Cultivar</option>
+      </select>
+    </div>
+    <div class='map-overlay-inner'>
+      <div>Disease Severity</div>
+        <div id='CBSD_legend' class='legend'>
+        </div>
+        <div id='CBSD_legend_text' class="legend">
+        </div>
+    </div>
+    <div class='map-overlay-inner'>
+      <div>Whitefly Count</div>
+        <div id='whitefly_legend' class='legend'>
+        </div>
+        <div id='whitefly_legend_text' class="legend">
+        </div>
+    </div>
+</div>
 
-      <h3>
-      <a id="user-content-header-3" class="anchor" href="#header-3" aria-hidden="true"><span class="octicon octicon-link"></span></a>Header 3</h3>
 
-      <pre><code>This is a code block following a header.</code></pre>
+<nav id="menu"></nav>
 
-      <h4>
-      <a id="user-content-header-4" class="anchor" href="#header-4" aria-hidden="true"><span class="octicon octicon-link"></span></a>Header 4</h4>
+<script>
 
-      <ul class="task-list">
-      <li>This is an unordered list following a header.</li>
-      <li>This is an unordered list following a header.</li>
-      <li>This is an unordered list following a header.</li>
-      </ul>
+var startingLoc = [32.6,1.35];
+var startingZoom = 6;
 
-      <h5>
-      <a id="user-content-header-5" class="anchor" href="#header-5" aria-hidden="true"><span class="octicon octicon-link"></span></a>Header 5</h5>
+mapboxgl.accessToken = 'pk.eyJ1IjoiZHNnMzgiLCJhIjoiY2lwaXNiOXlsMDA1NXZta3dxMDV3azQwYSJ9.XdVMSS9UIGCybRDzbsDMDQ';
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/dark-v9',
+    zoom: startingZoom,
+    center: startingLoc
+});
 
-      <ol class="task-list">
-      <li>This is an ordered list following a header.</li>
-      <li>This is an ordered list following a header.</li>
-      <li>This is an ordered list following a header.</li>
-      </ol>
+var layerId = 'FINAL_allCassavaSurveyDataSummar'
+var tileLink = 'mapbox://dsg38.cj5drv9n70ilb32kz5smjeakd-147h9'
+var cbsd_binary_column = 'cbsd_anyDisease_2'
 
-      <h6>
-      <a id="user-content-header-6" class="anchor" href="#header-6" aria-hidden="true"><span class="octicon octicon-link"></span></a>Header 6</h6>
+var cmd_binary_column = 'cmd_anyDisease_2'
+var missingStr = 'MIZ'
 
-      <table>
-      <thead>
-      <tr>
-      <th>What</th>
-      <th>Follows</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td>A table</td>
-      <td>A header</td>
-      </tr>
-      <tr>
-      <td>A table</td>
-      <td>A header</td>
-      </tr>
-      <tr>
-      <td>A table</td>
-      <td>A header</td>
-      </tr>
-      </tbody>
-      </table>
+var CBSD_legend = document.getElementById('CBSD_legend');
+var CBSD_legend_text = document.getElementById('CBSD_legend_text');
+var whitefly_legend = document.getElementById('whitefly_legend');
+var whitefly_legend_text = document.getElementById('whitefly_legend_text');
+var yearLabel = document.getElementById('year_slider_label');
+var yearSlider = document.getElementById('year_slider');
+var cumInstPicker = document.getElementById('data_picker_cumInst');
+var anyCultivarPicker = document.getElementById('data_picker_AnyCultivar');
+var pickData = document.getElementById('data_picker');
 
-      <hr>
 
-      <p>There's a horizontal rule above and below this.</p>
+var years = [ '2004.0', '2005.0', '2006.0', '2007.0', '2008.0', '2009.0', '2010.0', '2011.0', '2012.0', '2013.0', '2014.0', '2015.0' ]
 
-      <hr>
+yearSlider.max = years.length - 1;
 
-      <p>Here is an unordered list:</p>
+yearDataCumulative = "<="
+yearDataInstantaneous = "=="
+cumulativeOrInstantaneous = yearDataCumulative
 
-      <ul class="task-list">
-      <li>Salt-n-Pepa</li>
-      <li>Bel Biv DeVoe</li>
-      <li>Kid 'N Play</li>
-      </ul>
 
-      <p>And an ordered list:</p>
+var CBSD_colours = [
+    [-9999, '#d9d9d9'],
+    [0, '#2D6200'],
+    [0, '#2D6200'],
+    [0.0001, '#FFC300'],
+    [0.1, '#FFC300'],
+    [0.10001, '#FF5733'],
+    [0.5, '#FF5733'],
+    [0.50001, '#C70039'],
+    [1, '#C70039']
+  ];
 
-      <ol class="task-list">
-      <li>Michael Jackson</li>
-      <li>Michael Bolton</li>
-      <li>Michael Bublé</li>
-      </ol>
 
-      <p>And an unordered task list:</p>
+var true_false_colours = [
+    ['0.0', '#2D6200'],
+    ['1.0', '#C70039'],
+    [missingStr, '#1C37E6']
+  ];
 
-      <ul class="task-list">
-      <li class="task-list-item">
-      <input type="checkbox" class="task-list-item-checkbox" checked="" disabled=""> Create a sample markdown document</li>
-      <li class="task-list-item">
-      <input type="checkbox" class="task-list-item-checkbox" checked="" disabled=""> Add task lists to it</li>
-      <li class="task-list-item">
-      <input type="checkbox" class="task-list-item-checkbox" disabled=""> Take a vacation</li>
-      </ul>
+var whitefly_colours = [
+    [0, '#2D6200'],
+    [0, '#2D6200'],
+    [0.00001, '#FFC300'],
+    [5, '#FFC300'],
+    [5.00001, '#FA8808'],
+    [10, '#FA8808'],
+    [10.0001, '#FA5808'],
+    [15, '#FA5808'],
+    [15.0001, '#FA0808'],
+    [20, '#FA0808'],
+    [20.0001, '#FA08A2'],
+    [100, '#FA08A2'],
+    [100.0001, '#9E08FA'],
+    [200, '#9E08FA']
+  ];
 
-      <p>And a "mixed" task list:</p>
+pickData.addEventListener('click', function() {
 
-      <ul class="task-list">
-      <li class="task-list-item">
-      <input type="checkbox" class="task-list-item-checkbox" disabled=""> Steal underpants</li>
-      <li>?</li>
-      <li class="task-list-item">
-      <input type="checkbox" class="task-list-item-checkbox" disabled=""> Profit!</li>
-      </ul>
+  var theseColours = true_false_colours;
+  if (pickData.value == "whitefly_mean") {
+    var theseColours = whitefly_colours;
+  }
 
-      <p>And a nested list:</p>
+  map.setPaintProperty(layerId, 'circle-color', {
+      property: pickData.value,
+      stops: theseColours
+  });
+});
 
-      <ul class="task-list">
-      <li>Jackson 5
+cumInstPicker.addEventListener('click', function() {
 
-      <ul class="task-list">
-      <li>Michael</li>
-      <li>Tito</li>
-      <li>Jackie</li>
-      <li>Marlon</li>
-      <li>Jermaine</li>
-      </ul>
-      </li>
-      <li>TMNT
+  if(cumInstPicker.value == "cumulative") {
+    cumulativeOrInstantaneous = yearDataCumulative
+  }
+  if(cumInstPicker.value == "instantaneous") {
+    cumulativeOrInstantaneous = yearDataInstantaneous
+  }
 
-      <ul class="task-list">
-      <li>Leonardo</li>
-      <li>Michelangelo</li>
-      <li>Donatello</li>
-      <li>Raphael</li>
-      </ul>
-      </li>
-      </ul>
+  var yearIndex = parseInt(document.getElementById('year_slider').value, 10);
 
-      <p>Definition lists can be used with HTML syntax. Definition terms are bold and italic.</p>
+  filterBy(yearIndex)
 
-      <dl>
-          <dt>Name</dt>
-          <dd>Godzilla</dd>
-          <dt>Born</dt>
-          <dd>1952</dd>
-          <dt>Birthplace</dt>
-          <dd>Japan</dd>
-          <dt>Color</dt>
-          <dd>Green</dd>
-      </dl>
+});
 
-      <hr>
+anyCultivarPicker.addEventListener('click', function() {
 
-      <p>Tables should have bold headings and alternating shaded rows.</p>
+  if(anyCultivarPicker.value == "dominantCultivar") {
+    var cbsd_binary_column = 'cbsd_anyDisease_2'
+  }
+  if(anyCultivarPicker.value == "anyCultivar") {
+    var cbsd_binary_column = 'cbsd_in_any_cultivar'
+  }
 
-      <table>
-      <thead>
-      <tr>
-      <th>Artist</th>
-      <th>Album</th>
-      <th>Year</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td>Michael Jackson</td>
-      <td>Thriller</td>
-      <td>1982</td>
-      </tr>
-      <tr>
-      <td>Prince</td>
-      <td>Purple Rain</td>
-      <td>1984</td>
-      </tr>
-      <tr>
-      <td>Beastie Boys</td>
-      <td>License to Ill</td>
-      <td>1986</td>
-      </tr>
-      </tbody>
-      </table>
+  map.setPaintProperty(layerId, 'circle-color', {
+      property: cbsd_binary_column,
+      stops: true_false_colours
+  });
 
-      <p>If a table is too wide, it should condense down and/or scroll horizontally.</p>
+});
 
-      <table>
-      <thead>
-      <tr>
-      <th>Artist</th>
-      <th>Album</th>
-      <th>Year</th>
-      <th>Label</th>
-      <th>Awards</th>
-      <th>Songs</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td>Michael Jackson</td>
-      <td>Thriller</td>
-      <td>1982</td>
-      <td>Epic Records</td>
-      <td>Grammy Award for Album of the Year, American Music Award for Favorite Pop/Rock Album, American Music Award for Favorite Soul/R&amp;B Album, Brit Award for Best Selling Album, Grammy Award for Best Engineered Album, Non-Classical</td>
-      <td>Wanna Be Startin' Somethin', Baby Be Mine, The Girl Is Mine, Thriller, Beat It, Billie Jean, Human Nature, P.Y.T. (Pretty Young Thing), The Lady in My Life</td>
-      </tr>
-      <tr>
-      <td>Prince</td>
-      <td>Purple Rain</td>
-      <td>1984</td>
-      <td>Warner Brothers Records</td>
-      <td>Grammy Award for Best Score Soundtrack for Visual Media, American Music Award for Favorite Pop/Rock Album, American Music Award for Favorite Soul/R&amp;B Album, Brit Award for Best Soundtrack/Cast Recording, Grammy Award for Best Rock Performance by a Duo or Group with Vocal</td>
-      <td>Let's Go Crazy, Take Me With U, The Beautiful Ones, Computer Blue, Darling Nikki, When Doves Cry, I Would Die 4 U, Baby I'm a Star, Purple Rain</td>
-      </tr>
-      <tr>
-      <td>Beastie Boys</td>
-      <td>License to Ill</td>
-      <td>1986</td>
-      <td>Mercury Records</td>
-      <td>noawardsbutthistablecelliswide</td>
-      <td>Rhymin &amp; Stealin, The New Style, She's Crafty, Posse in Effect, Slow Ride, Girls, (You Gotta) Fight for Your Right, No Sleep Till Brooklyn, Paul Revere, Hold It Now, Hit It, Brass Monkey, Slow and Low, Time to Get Ill</td>
-      </tr>
-      </tbody>
-      </table>
 
-      <hr>
+function filterBy(yearIndex) {
 
-      <p>Code snippets like <code>var foo = "bar";</code> can be shown inline.</p>
+    var year = years[yearIndex];
+    yearLabel.textContent = parseInt(year);
 
-      <p>Also, <code>this should vertically align</code> <del><code>with this</code></del> <del>and this</del>.</p>
+    var filters = [cumulativeOrInstantaneous, "year", year];
 
-      <p>Code can also be shown in a block element.</p>
+    map.setFilter(layerId, filters);
+}
 
-      <pre><code>var foo = "bar";
-</code></pre>
+map.on('load', function () {
 
-      <p>Code can also use syntax highlighting.</p>
+  map.addSource(layerId, {
+      type: 'vector',
+      url: tileLink
+  });
+  map.addLayer({
+      'id': layerId,
+      'type': 'circle',
+      'source': layerId,
+      'source-layer': layerId,
+      'paint': {
+          // color circles by value, using data-driven styles
+          'circle-color': {
+              property: cbsd_binary_column,
+              stops: true_false_colours
+          }
+      }
+  });
 
-      <div class="highlight highlight-Javascript"><pre><span class="pl-k">var</span> foo <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>bar<span class="pl-pds">"</span></span>;</pre></div>
+  // Add legend bar
+  for(var iCol = CBSD_colours.length - 1; iCol >= 1; iCol--) {
+    var bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.title = CBSD_colours[iCol][0];
+    bar.style.width = 100.0 / (CBSD_colours.length - 1) + '%';
+    bar.style.backgroundColor = CBSD_colours[iCol][1];
+    CBSD_legend.insertBefore(bar, CBSD_legend.firstChild);
+  }
 
-      <pre><code>Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.</code></pre>
+  for(var iCol = CBSD_colours.length - 1; iCol > 0; iCol -= 2) {
+    var spacebar = document.createElement('div');
+    spacebar.className = 'bar';
+    spacebar.style.width = 50.0 / CBSD_colours.length + '%';
+    CBSD_legend_text.insertBefore(spacebar, CBSD_legend_text.firstChild);
 
-      <div class="highlight highlight-Javascript"><pre><span class="pl-k">var</span> foo <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>The same thing is true for code with syntax highlighting. A single line of code should horizontally scroll if it is really long.<span class="pl-pds">"</span></span>;</pre></div>
+    var bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.title = CBSD_colours[iCol][0];
+    bar.style.width = 100.0 / CBSD_colours.length + '%';
+    bar.textContent = Math.round(CBSD_colours[iCol - 1][0]) + " - " + CBSD_colours[iCol][0];
+    CBSD_legend_text.insertBefore(bar, CBSD_legend_text.firstChild);
 
-      <p>Inline code inside table cells should still be distinguishable.</p>
+    var spacebar = document.createElement('div');
+    spacebar.className = 'bar';
+    spacebar.style.width = 50.0 / CBSD_colours.length + '%';
+    CBSD_legend_text.insertBefore(spacebar, CBSD_legend_text.firstChild);
+  }
 
-      <table>
-      <thead>
-      <tr>
-      <th>Language</th>
-      <th>Code</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr>
-      <td>Javascript</td>
-      <td><code>var foo = "bar";</code></td>
-      </tr>
-      <tr>
-      <td>Ruby</td>
-      <td><code>foo = "bar"</code></td>
-      </tr>
-      </tbody>
-      </table>
+  // Add legend bar
+  for(var iCol = whitefly_colours.length - 1; iCol >= 0; iCol--) {
+    var bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.title = whitefly_colours[iCol][0];
+    bar.style.width = 100.0 / whitefly_colours.length + '%';
+    bar.style.backgroundColor = whitefly_colours[iCol][1];
+    whitefly_legend.insertBefore(bar, whitefly_legend.firstChild);
+  }
 
-      <hr>
+  for(var iCol = whitefly_colours.length - 1; iCol > 0; iCol -= 2) {
+    var spacebar = document.createElement('div');
+    spacebar.className = 'bar';
+    spacebar.style.width = 50.0 / whitefly_colours.length + '%';
+    //whitefly_legend_text.insertBefore(spacebar, whitefly_legend_text.firstChild);
 
-      <p>Small images should be shown at their actual size.</p>
+    var bar = document.createElement('div');
+    bar.className = 'bar';
+    bar.title = whitefly_colours[iCol][0];
+    bar.style.width = 200.0 / whitefly_colours.length + '%';
+    bar.textContent = Math.round(whitefly_colours[iCol - 1][0]) + " - " + whitefly_colours[iCol][0];
+    whitefly_legend_text.insertBefore(bar, whitefly_legend_text.firstChild);
 
-      <p><a href="https://camo.githubusercontent.com/16a9d5241f679b6429fc0597f10816dd2665bbb2/687474703a2f2f706c6163656b697474656e2e636f6d2f672f3330302f3230302f" target="_blank"><img src="https://camo.githubusercontent.com/16a9d5241f679b6429fc0597f10816dd2665bbb2/687474703a2f2f706c6163656b697474656e2e636f6d2f672f3330302f3230302f" alt="" data-canonical-src="https://placekitten.com/g/300/200/" style="max-width:100%;"></a></p>
+    var spacebar = document.createElement('div');
+    spacebar.className = 'bar';
+    spacebar.style.width = 50.0 / whitefly_colours.length + '%';
+    //whitefly_legend_text.insertBefore(spacebar, whitefly_legend_text.firstChild);
+  }
 
-      <p>Large images should always scale down and fit in the content container.</p>
+  filterBy(0);
 
-      <p><a href="https://camo.githubusercontent.com/afe46418285497605cf4f6376b75f8c818658fb1/687474703a2f2f706c6163656b697474656e2e636f6d2f672f313230302f3830302f" target="_blank"><img src="https://camo.githubusercontent.com/afe46418285497605cf4f6376b75f8c818658fb1/687474703a2f2f706c6163656b697474656e2e636f6d2f672f313230302f3830302f" alt="" data-canonical-src="https://placekitten.com/g/1200/800/" style="max-width:100%;"></a></p>
+  document.getElementById('year_slider').addEventListener('input', function(e) {
+      var yearIndex = parseInt(e.target.value, 10);
 
-      <pre><code>This is the final element on the page and there should be no margin below this.</code></pre>
+      filterBy(yearIndex)
 
-      <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/jasonlong/cayman-theme">Cayman</a> is maintained by <a href="https://github.com/jasonlong">jasonlong</a>.</span>
-        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a>.</span>
-      </footer>
+  });
 
-    </section>
+});
 
-  </body>
+map.on('click', function (e) {
+    var features = map.queryRenderedFeatures(e.point, { layers: [ layerId ] });
+    if (!features.length) {
+        return;
+    }
+
+    var feature = features[0];
+
+    if (!feature.properties[cbsd_binary_column]) {
+      var thisCBSDsev = '-9999'
+    } else {
+      var thisCBSDsev = feature.properties[cbsd_binary_column]
+    }
+
+    // if (!feature.properties.CBSD_Inc) {
+    //   var thisCBSDinc = '0'
+    // } else {
+    //   var thisCBSDinc = feature.properties.CBSD_Inc
+    // }
+
+    var popup = new mapboxgl.Popup()
+        .setLngLat(map.unproject(e.point))
+        // .setContent()
+        .setHTML('<p>form_id: ' + feature.properties["form_id"] + '</p> <p>date: ' + feature.properties["date"] + '</p>')
+        .addTo(map);
+
+});
+
+map.on('mousemove', function (e) {
+    document.getElementById('info').innerHTML =
+        // e.point is the x, y coordinates of the mousemove event relative
+        // to the top-left corner of the map
+        JSON.stringify(e.point) + '<br />' +
+            // e.lngLat is the longitude, latitude geographical position of the event
+        JSON.stringify(e.lngLat);
+});
+
+document.getElementById('fly').addEventListener('click', function () {
+    // Fly to a random location by offsetting the point -74.50, 40
+    // by up to 5 degrees.
+    map.flyTo({
+        center: [31.5, 3.0],
+        zoom: 8
+    });
+});
+
+document.getElementById('reset').addEventListener('click', function () {
+    // Fly to a random location by offsetting the point -74.50, 40
+    // by up to 5 degrees.
+    map.flyTo({
+        center: startingLoc,
+        zoom: startingZoom
+    });
+});
+
+
+</script>
+
+</body>
 </html>
