@@ -1,24 +1,16 @@
-- intro:
-  description: "You can list your side projects or open source libraries in this section. Lorem ipsum dolor
-  sit amet, consectetur adipiscing elit. Vestibulum et ligula in nunc bibendum fringilla a eu lectus."
+# Projects
+# uncomment the urls if you wish to display them, and add your own URL
 
-- project:
-  title: Velocity
-  link: "#hook"
-  tagline: "A responsive website template designed to help startups promote, market and sell their products."
-- project:
-  title: DevStudio
-  link: "#"
-  tagline: "A responsive website template designed to help web developers/designers market their services."
-- project:
-  title: Tempo
-  link: "#"
-  tagline: "A responsive website template designed to help startups promote their products or services and to attract users &amp; investors"
-- project:
-  title: Atom
-  link: "#"
-  tagline: "A comprehensive website template solution for startups/developers to market their mobile apps."
-- project:
-  title: Delta
-  link: "#"
-  tagline: "A responsive Bootstrap one page theme designed to help app developers promote their mobile apps"
+# donutfinder.io
+- project: donutfinder.io
+  role: Founder & Primary Developer
+  duration: 2012 &mdash; Present
+  # url: "#"
+  description: Donut Locator is an open source node/ember app that lets users find donuts within a defined radius from their home.
+
+#Springfield Donut Eater's User Group
+- project: Springfield Donut Eater's User Group
+  role: Co-Founder & Organizer
+  duration: 2007 &mdash; Present
+  # url: "#"
+  description: DEUG is a local monthly meetup in Springfield where we share all the latest tips and tricks for dat donut lifestyle. I organize the group, and typically eat most of the donuts.
